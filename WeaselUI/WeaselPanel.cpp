@@ -123,11 +123,10 @@ void WeaselPanel::_CreateLayout() {
     } else if (m_style.layout_type == UIStyle::LAYOUT_HORIZONTAL ||
                m_style.layout_type == UIStyle::LAYOUT_HORIZONTAL_FULLSCREEN) {
       layout = new HorizontalLayout(m_style, m_ctx, m_status, pDWR);
-    }
     } else if (m_style.layout_type == UIStyle::LAYOUT_MODERN) {
       // P0 MVP：现代化圆角卡片布局（ModernLayout），复用基类渲染，仅 DoLayout 差异。
       layout = new ModernLayout(m_style, m_ctx, m_status, pDWR);
-
+    }
 
     if (IS_FULLSCREENLAYOUT(m_style)) {
       layout = new FullScreenLayout(m_style, m_ctx, m_status, m_inputPos,
