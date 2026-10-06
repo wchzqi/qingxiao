@@ -19,7 +19,7 @@ jobs:
       SDKVER: 10.0.19041.0
     strategy:
       matrix:
-        variant: [msbuild, xmake]
+        variant: [msbuild]
     steps:
       - name: Checkout last commit
         uses: actions/checkout@v4
@@ -89,6 +89,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force .\output\Win32 | Out-Null
           copy .\winsparkle\x64\Release\WinSparkle.dll .\output\
           copy .\winsparkle\x64\Release\WinSparkle.lib .\lib64\
           copy .\winsparkle\Release\WinSparkle.dll .\output\Win32\
