@@ -160,10 +160,17 @@ class RimeWithWeaselHandler : public weasel::RequestHandler {
   void _ClearToolState();
 
   RimeSessionId to_session_id(WeaselSessionId ipc_id) {
-    return m_session_status_map[ipc_id].session_id;
+    return get_session_status(ipc_id).session_id;
   }
   SessionStatus& get_session_status(WeaselSessionId ipc_id) {
-    return m_session_status_map[ipc_id];
+    // piecewise_construct 避免 map value 的 pair 拷贝（SessionStatus 含 std::mutex 不可拷贝）。
+    auto it = m_session_status_map.find(ipc_id);
+    if (it == m_session_status_map.end()) {
+      it = m_session_status_map.emplace(std::piecewise_construct,
+                                        std::forward_as_tuple(ipc_id),
+                                        std::forward_as_tuple()).first;
+    }
+    return it->second;
   }
   SessionStatus& new_session_status(WeaselSessionId ipc_id) {
     return m_session_status_map.emplace(std::piecewise_construct,
