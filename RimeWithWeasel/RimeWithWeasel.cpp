@@ -478,6 +478,25 @@ BOOL RimeWithWeaselHandler::ProcessKeyEvent(KeyEvent keyEvent,
              << ", mask = " << keyEvent.mask << ", ipc_id = " << ipc_id;
   if (m_disabled)
     return FALSE;
+  // P2-C：voice 识别结果上屏（worker 线程写入 pending，本按键消费并 commit）。
+  {
+    SessionStatus& sst = get_session_status(ipc_id);
+    std::wstring voice_text;
+    {
+      std::lock_guard<std::mutex> lk(sst.aux_mtx);
+      voice_text.swap(sst.pending_voice_commit);
+    }
+    if (!voice_text.empty()) {
+      std::wstring body;
+      body.append(L"action=commit,status\n");
+      body.append(L"commit=").append(escape_string(voice_text)).append(L"\n");
+      body.append(L"status.composing=0\n.\n");
+      eat(body);
+      _UpdateUI(ipc_id);
+      m_active_session = ipc_id;
+      return TRUE;
+    }
+  }
   RimeSessionId session_id = to_session_id(ipc_id);
   Bool handled = rime_api->process_key(session_id, keyEvent.keycode,
                                        expand_ibus_modifier(keyEvent.mask));
@@ -980,7 +999,7 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
       m_translate->Submit(ipc_id, text_u8, lang_u8);
     }
     // 立即回执（译文稍后经 ctx.aux= 异步到候选窗上方，非本响应体内）。
-    eat(L"translate.ok=1\n.\n");
+    std::wstring msg983(L"translate.ok=1\n.\n"); eat(msg983);
     return true;
   }
 
@@ -992,16 +1011,18 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
     }
     bool ok = m_voice->Start(
       [this](const std::string& text_utf8) {
-        // 识别结果回调：直接旁路 commit 到当前活动会话。
-        if (!text_utf8.empty() && rime_api) {
-          RimeSessionId sid = to_session_id(m_active_session);
-          rime_api->commit_string(sid, text_utf8.c_str());
+        // 识别结果回调：写入 pending_voice_commit，由主线程按键时经
+        // weasel 既有 commit 消息链路上屏（librime 无公开的提交指定文本 API）。
+        if (!text_utf8.empty()) {
+          SessionStatus& sst = get_session_status(m_active_session);
+          std::lock_guard<std::mutex> lk(sst.aux_mtx);
+          sst.pending_voice_commit = u8tow(text_utf8);
         }
       });
     if (!ok) {
-      eat(L"voice.error=no_microphone_or_model\n.\n");
+      std::wstring msg1002(L"voice.error=no_microphone_or_model\n.\n"); eat(msg1002);
     } else {
-      eat(L"voice.state=recording\n.\n");
+      std::wstring msg1004(L"voice.state=recording\n.\n"); eat(msg1004);
     }
     return true;
   }
@@ -1010,13 +1031,13 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
     if (m_voice) {
       m_voice->Stop();
     }
-    eat(L"voice.state=idle\n.\n");
+    std::wstring msg1013(L"voice.state=idle\n.\n"); eat(msg1013);
     return true;
   }
 
   if (message_id == L"voice.status") {
     if (!m_voice) {
-      eat(L"voice.state=unavailable\nvoice.model=not_configured\n.\n");
+      std::wstring msg1019(L"voice.state=unavailable\nvoice.model=not_configured\n.\n"); eat(msg1019);
       return true;
     }
     std::wstring resp = L"voice.state=";

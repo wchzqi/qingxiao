@@ -57,6 +57,8 @@ struct SessionStatus {
   RimeStatus status;
   bool __synced;
   RimeSessionId session_id;
+  // P2-C：voice 识别结果待上屏文本（worker 线程写入、主线程按键时消费）。
+  std::wstring pending_voice_commit;
   // P2-A：待下发到 ctx.aux 的文本（P2-E 翻译/tips）。
   // _Respond 读取并经 ctx.aux=<文本> 下发；空串则不下发。
   std::wstring pending_aux;
