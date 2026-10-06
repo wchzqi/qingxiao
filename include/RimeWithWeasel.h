@@ -23,6 +23,7 @@
 #include <rime_api.h>
 
 #include "ClipboardManager.h"
+#include "EmojiProvider.h"
 #include "NetworkGate.h"
 #include "TranslationService.h"
 #include "VoiceInputService.h"
@@ -162,7 +163,7 @@ class RimeWithWeaselHandler : public weasel::RequestHandler {
     return m_session_status_map[ipc_id];
   }
   SessionStatus& new_session_status(WeaselSessionId ipc_id) {
-    return m_session_status_map[ipc_id] = SessionStatus();
+    return m_session_status_map.emplace(ipc_id, SessionStatus()).first->second;
   }
 
   AppOptionsByAppName m_app_options;
