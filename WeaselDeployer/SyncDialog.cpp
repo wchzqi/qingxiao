@@ -23,7 +23,10 @@ std::string GetEffectiveSyncDirUtf8(const weasel::SyncOptions& options) {
   }
   char dir[MAX_PATH] = {0};
   RimeApi* rime = rime_get_api();
-  if (rime && rime->get_user_data_sync_dir(dir, _countof(dir))) {
+  if (rime) {
+    rime->get_user_data_sync_dir(dir, _countof(dir));
+  }
+  if (dir[0] != '\0') {
     // librime 该 API 在 Windows 下返回 ACP，转 UTF-8 统一存储/展示
     return wstring_to_string(string_to_wstring(dir, CP_ACP), CP_UTF8);
   }

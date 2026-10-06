@@ -52,6 +52,27 @@
 #define IDC_IMPORT                      1011
 #define IDC_STATIC1                     -1
 
+// ---- 青筱 P1-B6 同步对话框（独占 50051~50055 段）----
+#define IDD_SYNC_SETTING                160
+#define IDC_SYNC_DIR                    50051
+#define IDC_SYNC_BROWSE                 50052
+#define IDC_SYNC_NOW                    50053
+#define IDC_SYNC_OPEN_EXPLORER          50054
+#define IDC_SYNC_STATUS                 50055
+
+// ---- 青筱 P1-B7 自定义短语对话框（独占 50031~50040 段）----
+#define IDD_CUSTOM_PHRASE               200
+#define IDC_CUSTOM_PHRASE_LIST          50031
+#define IDC_CUSTOM_PHRASE_WORD          50032
+#define IDC_CUSTOM_PHRASE_CODE          50033
+#define IDC_CUSTOM_PHRASE_WEIGHT        50034
+#define IDC_CP_ADD                      50035
+#define IDC_CP_MODIFY                   50036
+#define IDC_CP_DELETE                   50037
+#define IDC_CP_EXPORT                   50038
+#define IDC_CP_IMPORT                   50039
+#define IDC_OPEN_CUSTOM_PHRASE          50040
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
