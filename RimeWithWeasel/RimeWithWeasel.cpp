@@ -1545,10 +1545,9 @@ bool RimeWithWeaselHandler::_Respond(WeaselSessionId ipc_id, EatLine eat) {
   // 该选项由既有 _ReadClientInfo 的 app_options 循环（基线 line 437-440）
   // 在游戏进程会话建立时自动 set_option 写入；此处仅读回。
   // true = 抑制候选窗/内嵌回写，但 commit 上屏键仍正常放行（不丢键）。
+  RimeSessionId session_id = session_status.session_id;
   const bool suppress_panel =
       !!rime_api->get_option(session_id, "suppress_panel");
-
-  RimeSessionId session_id = session_status.session_id;
   RIME_STRUCT(RimeCommit, commit);
   if (rime_api->get_commit(session_id, &commit)) {
     actions.push_back("commit");
@@ -1706,7 +1705,7 @@ bool RimeWithWeaselHandler::_Respond(WeaselSessionId ipc_id, EatLine eat) {
         weasel::ExtraCard card;
         card.type = weasel::CARD_CLOUD;
         card.title = L"云候选";
-        const std::wstring word = weasel::u8tow(cloud_cands.front());
+        const std::wstring word = u8tow(cloud_cands.front());
         card.body = word;                  // 云端词单行展示
         card.action = word;                // 选中后 commit 文本（TSF 直提）
         card.action_id = ++m_cloud_action_id;
