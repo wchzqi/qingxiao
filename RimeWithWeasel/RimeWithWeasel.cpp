@@ -10,6 +10,7 @@
 #include <array>
 #include <vector>
 #include <regex>
+#include <algorithm>
 #include <rime_api.h>
 #include <ClipboardManager.h>
 #include <boost/archive/text_woarchive.hpp>
@@ -172,6 +173,10 @@ void RimeWithWeaselHandler::Initialize() {
     rime_api->join_maintenance_thread();
   }
 
+  // ===== P1-B1：剪贴板配置（定义于 config_open 块外，供块外启动监听使用） =====
+  Bool clipboard_enabled = true;
+  int clipboard_max = 50;
+
   RimeConfig config = {NULL};
   if (rime_api->config_open("weasel", &config)) {
     if (m_ui) {
@@ -198,8 +203,6 @@ void RimeWithWeaselHandler::Initialize() {
     // ===== P1-B1：tool/clipboard/* 配置读取（基线 §5） =====
     // 未知键安全忽略；默认 enabled=true / max_entries=50。
     // GUI 设置中心（P1-B3 SettingsStore）落地前，此处即唯一读取点。
-    Bool clipboard_enabled = true;
-    int clipboard_max = 50;
     rime_api->config_get_bool(&config, "tool/clipboard/enabled",
                               &clipboard_enabled);
     rime_api->config_get_int(&config, "tool/clipboard/max_entries",
@@ -812,7 +815,7 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
         pinyin_w = payload.substr(kPre.size());
     }
     if (m_cloud) {
-      m_cloud->Invalidate(weasel::wtou8(pinyin_w));  // 强制重发
+      m_cloud->Invalidate(wtou8(pinyin_w));  // 强制重发
     }
     return true;  // 下一帧 _Respond 即带最新卡片
   }
@@ -826,7 +829,7 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
         pinyin_w = payload.substr(kPre.size());
     }
     if (m_cloud)
-      m_cloud->Promote(weasel::wtou8(pinyin_w));
+      m_cloud->Promote(wtou8(pinyin_w));
     return true;
   }
   if (message_id == L"cloud.cache_clear") {
@@ -966,7 +969,8 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
     text_w = get_param(p, L"text=");
     lang_w = get_param(p, L"target_lang=");
     if (text_w.empty()) {
-      eat(L"translate.ok=0\n.\n");
+      std::wstring empty_msg(L"translate.ok=0\n.\n");
+      eat(empty_msg);
       return true;  // 空文本：静默接受，不译
     }
     // wstring -> utf8 交给服务端翻译（数据最小化：只传这一段文本）。
@@ -2146,46 +2150,46 @@ static void _UpdateUIStyle(RimeConfig* config, UI* ui, bool initialize) {
   if (style.layout_type != UIStyle::LAYOUT_VERTICAL_TEXT) {
     // hilite_padding vs spacing
     // if hilite_padding over spacing, increase spacing
-    style.spacing = max(style.spacing, style.hilite_padding_y * 2);
+    style.spacing = std::max(style.spacing, style.hilite_padding_y * 2);
     // hilite_padding vs candidate_spacing
     if (style.layout_type == UIStyle::LAYOUT_VERTICAL_FULLSCREEN ||
         style.layout_type == UIStyle::LAYOUT_VERTICAL) {
       // vertical, if hilite_padding_y over candidate spacing,
       // increase candidate spacing
       style.candidate_spacing =
-          max(style.candidate_spacing, style.hilite_padding_y * 2);
+          std::max(style.candidate_spacing, style.hilite_padding_y * 2);
     } else {
       // horizontal, if hilite_padding_x over candidate
       // spacing, increase candidate spacing
       style.candidate_spacing =
-          max(style.candidate_spacing, style.hilite_padding_x * 2);
+          std::max(style.candidate_spacing, style.hilite_padding_x * 2);
     }
     // hilite_padding_x vs hilite_spacing
     if (!style.inline_preedit)
-      style.hilite_spacing = max(style.hilite_spacing, style.hilite_padding_x);
+      style.hilite_spacing = std::max(style.hilite_spacing, style.hilite_padding_x);
   } else  // LAYOUT_VERTICAL_TEXT
   {
     // hilite_padding_x vs spacing
     // if hilite_padding over spacing, increase spacing
-    style.spacing = max(style.spacing, style.hilite_padding_x * 2);
+    style.spacing = std::max(style.spacing, style.hilite_padding_x * 2);
     // hilite_padding vs candidate_spacing
     // if hilite_padding_x over candidate
     // spacing, increase candidate spacing
     style.candidate_spacing =
-        max(style.candidate_spacing, style.hilite_padding_x * 2);
+        std::max(style.candidate_spacing, style.hilite_padding_x * 2);
     // vertical_text_with_wrap and hilite_padding_y over candidate_spacing
     if (style.vertical_text_with_wrap)
       style.candidate_spacing =
-          max(style.candidate_spacing, style.hilite_padding_y * 2);
+          std::max(style.candidate_spacing, style.hilite_padding_y * 2);
     // hilite_padding_y vs hilite_spacing
     if (!style.inline_preedit)
-      style.hilite_spacing = max(style.hilite_spacing, style.hilite_padding_y);
+      style.hilite_spacing = std::max(style.hilite_spacing, style.hilite_padding_y);
   }
   // fix padding and margin settings
   int scale = style.margin_x < 0 ? -1 : 1;
-  style.margin_x = scale * max(style.hilite_padding_x, abs(style.margin_x));
+  style.margin_x = scale * std::max(style.hilite_padding_x, abs(style.margin_x));
   scale = style.margin_y < 0 ? -1 : 1;
-  style.margin_y = scale * max(style.hilite_padding_y, abs(style.margin_y));
+  style.margin_y = scale * std::max(style.hilite_padding_y, abs(style.margin_y));
   // get enhanced_position
   _RimeGetBool(config, "style/enhanced_position", initialize,
                style.enhanced_position, true, false);
