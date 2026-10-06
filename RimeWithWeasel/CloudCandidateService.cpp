@@ -1,8 +1,12 @@
-// ============================================================================
+﻿// ============================================================================
 // 青筱（QingXiaoType）P2-B：CloudCandidateService 实现（可移植核心）
 // 对应头文件 CloudCandidateService.h。本文件不依赖 windows.h / rime_api.h，
 // 可在 Linux 用 g++ 直接编译做纯逻辑单测（见 test/p2_b_cloud_test.cpp）。
 // ============================================================================
+
+#ifndef QINGXIAO_LINUX_SELFTEST
+#include "stdafx.h"
+#endif
 
 #include "CloudCandidateService.h"
 

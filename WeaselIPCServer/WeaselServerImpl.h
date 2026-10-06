@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <WeaselIPC.h>
 #include <map>
 #include <Winnt.h>   // for security attributes constants
@@ -24,7 +24,7 @@ class ServerImpl : public CWindowImpl<ServerImpl, CWindow, ServerWinTraits>
   MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
   MESSAGE_HANDLER(WM_CLOSE, OnClose)
   MESSAGE_HANDLER(WM_QUERYENDSESSION, OnQueryEndSystemSession)
-  MESSAGE_HANDLER(WM_ENDSESSION, OnEndSession)
+  MESSAGE_HANDLER(WM_ENDSESSION, OnEndSystemSession)
   MESSAGE_HANDLER(WM_DWMCOLORIZATIONCOLORCHANGED, OnColorChange)
   MESSAGE_HANDLER(WM_SETTINGCHANGE, OnColorChange)
   MESSAGE_HANDLER(WM_COMMAND, OnCommand)

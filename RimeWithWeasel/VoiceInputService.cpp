@@ -1,4 +1,4 @@
-// ============================================================================
+﻿// ============================================================================
 // 青筱（QingXiaoType）P2-C：VoiceInputService 实现
 // 对应头文件 VoiceInputService.h。
 //
@@ -24,7 +24,7 @@
 //   #include <sherpa-onnx/csrc/silero-vad-model-config.h>
 //
 // 本机 Linux 静态自检：以下 stub 类型占位，保证符号可核对。
-#ifdef _WIN32
+#ifdef WEASEL_WITH_SHERPA
   #include <sherpa-onnx/csrc/offline-recognizer.h>
   #include <sherpa-onnx/csrc/vad-model.h>
 #else

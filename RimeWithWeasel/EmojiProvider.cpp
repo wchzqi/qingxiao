@@ -1,8 +1,12 @@
-// ============================================================================
+﻿// ============================================================================
 // 青简（Qingjian）P1-B2：EmojiProvider 实现
 // 详见 EmojiProvider.h 头部说明。本文件不依赖 rime_api，仅用 C++17 标准库 +
 // WeaselUtility.h 提供的共享数据目录路径助手（WeaselSharedDataPath）。
 // ============================================================================
+#ifndef QINGXIAO_LINUX_SELFTEST
+#include "stdafx.h"
+#endif
+
 #include "EmojiProvider.h"
 
 #include <algorithm>
