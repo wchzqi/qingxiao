@@ -35,7 +35,7 @@ typedef enum { COLOR_ABGR = 0, COLOR_ARGB, COLOR_RGBA } ColorFormat;
 using namespace weasel;
 
 static RimeApi* rime_api;
-WeaselSessionId _GenerateNewWeaselSessionId(SessionStatusMap sm, DWORD pid) {
+WeaselSessionId _GenerateNewWeaselSessionId(const SessionStatusMap& sm, DWORD pid) {
   if (sm.empty())
     return (WeaselSessionId)(pid + 1);
   return (WeaselSessionId)(sm.rbegin()->first + 1);
