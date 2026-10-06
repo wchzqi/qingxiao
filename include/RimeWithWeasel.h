@@ -15,6 +15,7 @@
 #include <WeaselIPC.h>
 #include <WeaselUI.h>
 #include <map>
+#include <tuple>
 #include <memory>
 #include <string>
 #include <mutex>
@@ -163,7 +164,9 @@ class RimeWithWeaselHandler : public weasel::RequestHandler {
     return m_session_status_map[ipc_id];
   }
   SessionStatus& new_session_status(WeaselSessionId ipc_id) {
-    return m_session_status_map.emplace(ipc_id, SessionStatus()).first->second;
+    return m_session_status_map.emplace(std::piecewise_construct,
+                                        std::forward_as_tuple(ipc_id),
+                                        std::forward_as_tuple()).first->second;
   }
 
   AppOptionsByAppName m_app_options;

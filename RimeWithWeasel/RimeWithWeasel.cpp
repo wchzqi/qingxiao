@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <logging.h>
 #include <RimeWithWeasel.h>
 #include <StringAlgorithm.hpp>
@@ -39,6 +39,12 @@ WeaselSessionId _GenerateNewWeaselSessionId(SessionStatusMap sm, DWORD pid) {
     return (WeaselSessionId)(pid + 1);
   return (WeaselSessionId)(sm.rbegin()->first + 1);
 }
+
+namespace {
+// 面板分页大小：候选 label 1..9,0 共 10 条/页（基线 §2）。
+// 定义置于文件前部：_HandleToolPick / _SendToolPanel 等多处先于旧定义位置使用。
+constexpr size_t kToolPageSize = 10;
+}  // namespace
 
 int expand_ibus_modifier(int m) {
   return (m & 0xff) | ((m & 0xff00) << 16);
@@ -128,8 +134,8 @@ static std::string ResolveAiCloudKey() {
 // 空/缺键 → 空 vector（= 全部启用兜底，与 AIAssistant::ActionEnabled 约定一致）。
 static std::vector<weasel::AIActionType> ParseAiActions(RimeConfig* config) {
   std::vector<weasel::AIActionType> out;
-  const char* raw = nullptr;
-  if (!rime_api->config_get_string(config, "ai/actions", &raw) || !raw || !*raw)
+  char raw[512] = {0};
+  if (!rime_api->config_get_string(config, "ai/actions", raw, sizeof(raw) - 1) || !raw[0])
     return out;  // 空 = 全部启用
   std::string s(raw);
   size_t pos = 0;
@@ -221,13 +227,13 @@ void RimeWithWeaselHandler::Initialize() {
       rime_api->config_get_bool(&config, "ai/enabled", &ai_enabled);
       aicfg.enabled = !!ai_enabled;
 
-      const char* route = "local";
-      rime_api->config_get_string(&config, "ai/route", &route);
-      aicfg.route = u8tow(route);
+      char route_buf[256] = {0};
+      rime_api->config_get_string(&config, "ai/route", route_buf, sizeof(route_buf) - 1);
+      aicfg.route = u8tow(route_buf[0] ? route_buf : "local");
 
-      const char* ep = "";
-      rime_api->config_get_string(&config, "ai/cloud_endpoint", &ep);
-      aicfg.cloud_endpoint = ep ? ep : "";
+      char ep_buf[1024] = {0};
+      rime_api->config_get_string(&config, "ai/cloud_endpoint", ep_buf, sizeof(ep_buf) - 1);
+      aicfg.cloud_endpoint = ep_buf;
 
       // cloud_key：privacy 契约不落 YAML 明文——读环境变量 AI_CLOUD_KEY；
       // Windows 生产可改 Credential Manager（CredRead）。未设置 → 空，云端降级本地。
@@ -1029,10 +1035,6 @@ bool RimeWithWeaselHandler::HandleExtension(const std::wstring& message_id,
   return false;
 }
 
-namespace {
-// 面板分页大小：候选 label 1..9,0 共 10 条/页（基线 §2）。
-constexpr size_t kToolPageSize = 10;
-}  // namespace
 
 void RimeWithWeaselHandler::_ClearToolState() {
   m_tool_type.clear();
