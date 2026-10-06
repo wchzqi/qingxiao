@@ -187,10 +187,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Configurator.h" />
+    <ClInclude Include="CustomPhraseDialog.h" />
     <ClInclude Include="DictManagementDialog.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="SettingsStore.h" />
+    <ClInclude Include="SogouDictImporter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwitcherSettingsDialog.h" />
+    <ClInclude Include="SyncDialog.h" />
+    <ClInclude Include="SyncOptions.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UIStyleSettings.h" />
     <ClInclude Include="UIStyleSettingsDialog.h" />
@@ -199,7 +204,10 @@
   <ItemGroup>
     <ClCompile Include="..\RimeWithWeasel\WeaselUtility.cpp" />
     <ClCompile Include="Configurator.cpp" />
+    <ClCompile Include="CustomPhraseDialog.cpp" />
     <ClCompile Include="DictManagementDialog.cpp" />
+    <ClCompile Include="SettingsStore.cpp" />
+    <ClCompile Include="SogouDictImporter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -207,6 +215,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SwitcherSettingsDialog.cpp" />
+    <ClCompile Include="SyncDialog.cpp" />
+    <ClCompile Include="SyncOptions.cpp" />
     <ClCompile Include="UIStyleSettings.cpp" />
     <ClCompile Include="UIStyleSettingsDialog.cpp" />
     <ClCompile Include="WeaselDeployer.cpp" />
