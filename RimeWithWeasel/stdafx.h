@@ -7,6 +7,10 @@
 
 #include "targetver.h"
 
+#ifndef NOMINMAX
+#define NOMINMAX  // 禁用 Windows min/max 宏，允许 std::min/std::max（青筱 P1 工具面板分页用）
+#endif
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 
